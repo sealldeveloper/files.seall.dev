@@ -287,7 +287,7 @@ $computerModel = $computerSystem.Model
 
 $computerManufacturer = $computerSystem.Manufacturer
 
-$computerUUID = Get-WmiObject -Class Win32_ComputerSystemProduct | Select UUID | Out-String
+$computerUUID = Get-WmiObject -Class Win32_ComputerSystemProduct | Select UUID
 
 $computerBIOS = Get-CimInstance CIM_BIOSElement  | Out-String
 
